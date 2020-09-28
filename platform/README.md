@@ -85,3 +85,234 @@ function create() {
 }
 
 ```
+
+### Aggiungere giocatore
+
+```javascript
+
+let player;
+
+//in create
+player = this.physics.add.sprite(100, 450, "dude");
+```
+
+### Rimbalzo sul suolo
+
+```javascript
+//in create    
+player.setBounce(0.2);
+player.setCollideWorldBounds(true);
+```
+
+### Rimbalzo sulle piattaforme
+
+```javascript
+this.physics.add.collider(player, platforms);
+```
+
+### Muovere il giocatore
+
+```javascript
+let cursors;
+
+function update() {
+    cursors = this.input.keyboard.createCursorKeys();
+
+    if (cursors.left.isDown) {
+        player.setVelocityX(-160);
+   }
+    else if (cursors.right.isDown) {
+        player.setVelocityX(160);
+    }
+    else {
+        player.setVelocityX(0);
+    }
+
+    if (cursors.up.isDown) {
+        player.setVelocityY(-330);
+    }
+}
+```
+
+### Non far 'volare' il giocatore
+
+```javascript
+if (cursors.up.isDown && player.body.touching.down) {
+        player.setVelocityY(-330);
+}
+```
+
+### Animare il giocatore
+
+```javascript
+//in create
+this.anims.create({
+    key: "left",
+    frames: this.anims.generateFrameNumbers("dude", { start: 0, end: 3 }),
+    frameRate: 10,
+    repeat: -1
+});
+
+this.anims.create({
+    key: "turn",
+    frames: [ { key: 'dude', frame: 4 } ],
+    frameRate: 20
+});
+
+this.anims.create({
+    key: "right",
+    frames: this.anims.generateFrameNumbers('dude', { start: 5, end: 8 }),
+    frameRate: 10,
+    repeat: -1
+});
+
+
+//update
+function update() {
+    cursors = this.input.keyboard.createCursorKeys();
+
+    if (cursors.left.isDown) {
+        player.setVelocityX(-160);
+        player.anims.play("left", true);
+    }
+    else if (cursors.right.isDown) {
+        player.setVelocityX(160);
+        player.anims.play("right", true);
+    }
+    else {
+        player.setVelocityX(0);
+        player.anims.play("turn");
+    }
+
+    if (cursors.up.isDown && player.body.touching.down) {
+        player.setVelocityY(-330);
+    }
+    
+}
+
+```
+
+### Arrivare sulle piattaforme
+
+```javascript
+player.setVelocityY(-400);
+```
+
+### Aggiungere le stelle
+
+```javascript
+
+//in create
+stars = this.physics.add.group({
+    key: "star",
+    repeat: 11,
+    setXY: { x: 12, y: 0, stepX: 70 }
+});
+
+```
+
+### Le stelle non cadono
+
+```javascript
+//in create
+this.physics.add.collider(stars, platforms);
+```
+
+### Le stelle rimbalzano
+
+```javascript
+//in create
+stars.children.iterate(function (star) {
+    star.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+});
+```
+
+### Prendere le stelle
+
+```javascript
+
+function collectStar(player, star) {
+    star.disableBody(true, true);
+}
+
+//in create
+this.physics.add.overlap(player, stars, collectStar, null, this);
+```
+
+### Il punteggio
+
+```javascript
+
+let score = 0;
+let scoreText;
+
+//in create
+scoreText = this.add.text(16, 16, "score: 0", { fontSize: "32px", fill: "#000" });
+
+
+function collectStar(player, star) {
+    star.disableBody(true, true);
+
+    score += 10;
+    scoreText.setText("Score: " + score);
+}
+```
+
+### Quando prendo tutte le stelle appare una bomba
+
+```javascript
+let bombs;
+
+
+//in create
+bombs = this.physics.add.group();
+this.physics.add.collider(bombs, platforms);
+
+
+//in collectStar
+if (stars.countActive(true) === 0) {
+    stars.children.iterate(function (star) {
+        star.enableBody(true, star.x, 0, true, true);
+    });
+
+    let x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
+
+    let bomb = bombs.create(x, 16, 'bomb');
+    bomb.setBounce(1);
+    bomb.setCollideWorldBounds(true);
+    bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
+
+}
+
+```
+
+### Finire il gioco quando tocco una bomba
+
+
+Un colore RGB in intero https://www.checkyourmath.com/convert/color/rgb_decimal.php
+
+
+```javascript
+
+//in create
+this.physics.add.collider(player, bombs, hitBomb, null, this);
+
+function hitBomb(player, bomb) {
+    this.physics.pause();
+
+    player.setTint(16711680);
+
+    player.anims.play("turn");
+
+    gameOver = true;
+}
+
+```
+
+### No debug
+
+```javascript
+
+debug: false
+
+```
