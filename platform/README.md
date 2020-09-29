@@ -235,11 +235,12 @@ stars.children.iterate(function (star) {
 ```javascript
 
 function collectStar(player, star) {
+    //disableGameObject, hideGameObject
     star.disableBody(true, true);
 }
 
 //in create
-this.physics.add.overlap(player, stars, collectStar, null, this);
+this.physics.add.overlap(player, stars, collectStar);
 ```
 
 ### Il punteggio
@@ -250,7 +251,7 @@ let score = 0;
 let scoreText;
 
 //in create
-scoreText = this.add.text(16, 16, "score: 0", { fontSize: "32px", fill: "#000" });
+scoreText = this.add.text(16, 16, "score: 0", { fontSize: "32px", fill: "black" });
 
 
 function collectStar(player, star) {
@@ -273,6 +274,7 @@ this.physics.add.collider(bombs, platforms);
 
 
 //in collectStar
+//Counts the number of active (or inactive) group members
 if (stars.countActive(true) === 0) {
     stars.children.iterate(function (star) {
         star.enableBody(true, star.x, 0, true, true);
@@ -298,6 +300,8 @@ Un colore RGB in intero https://www.checkyourmath.com/convert/color/rgb_decimal.
 ```javascript
 
 //in create
+//null -> callback di validazione prima di hitBomb
+//this -> contesto di esecuzione
 this.physics.add.collider(player, bombs, hitBomb, null, this);
 
 function hitBomb(player, bomb) {
@@ -305,9 +309,6 @@ function hitBomb(player, bomb) {
 
     player.setTint(16711680);
 
-    player.anims.play("turn");
-
-    gameOver = true;
 }
 
 ```
