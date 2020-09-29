@@ -38,6 +38,8 @@ function update() {
 
 ## Caricamento risorse
 
+https://drive.google.com/drive/folders/13rurxLqjFmbapZ43p32UBWVKh1JnYna0?usp=sharing
+
 ```javascript
 //in preload. immagini
 this.load.image("sky", "assets/sky.png");
@@ -100,13 +102,14 @@ player = this.physics.add.sprite(100, 450, "dude");
 
 ```javascript
 //in create    
-player.setBounce(0.2);
 player.setCollideWorldBounds(true);
 ```
 
 ### Rimbalzo sulle piattaforme
 
 ```javascript
+//in create
+player.setBounce(0.2);
 this.physics.add.collider(player, platforms);
 ```
 
@@ -142,15 +145,20 @@ if (cursors.up.isDown && player.body.touching.down) {
 }
 ```
 
+### Arrivare sulle piattaforme
+
+```javascript
+player.setVelocityY(-400);
+```
+
 ### Animare il giocatore
 
 ```javascript
 //in create
 this.anims.create({
     key: "left",
-    frames: this.anims.generateFrameNumbers("dude", { start: 0, end: 3 }),
-    frameRate: 10,
-    repeat: -1
+    frames: [{key : "dude", frame : 0},{key : "dude", frame : 1},{key : "dude", frame : 2},{key : "dude", frame : 3}],
+    frameRate: 10
 });
 
 this.anims.create({
@@ -162,8 +170,7 @@ this.anims.create({
 this.anims.create({
     key: "right",
     frames: this.anims.generateFrameNumbers('dude', { start: 5, end: 8 }),
-    frameRate: 10,
-    repeat: -1
+    frameRate: 10
 });
 
 
@@ -173,6 +180,7 @@ function update() {
 
     if (cursors.left.isDown) {
         player.setVelocityX(-160);
+        // true -> ignoreIfPlaying
         player.anims.play("left", true);
     }
     else if (cursors.right.isDown) {
@@ -192,11 +200,6 @@ function update() {
 
 ```
 
-### Arrivare sulle piattaforme
-
-```javascript
-player.setVelocityY(-400);
-```
 
 ### Aggiungere le stelle
 
