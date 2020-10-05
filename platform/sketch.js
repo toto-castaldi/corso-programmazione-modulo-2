@@ -111,7 +111,17 @@ function create() {
     });
 }
 
-function update() {
+function update(time, delta) {
+    deltaSum += delta;
+
+    if (deltaSum > 5000) {
+        deltaSum = 0;
+        if (score >= 10) {
+            score -= 10;
+            scoreText.setText("Score: " + score);
+        }
+    }
+
     cursors = this.input.keyboard.createCursorKeys();
 
     if (cursors.left.isDown) {
@@ -152,6 +162,7 @@ function collectStar(player, star) {
         this.sound.play("coin");
     }
 
+    deltaSum = 0;
 
     star.disableBody(true, true);
 
@@ -183,3 +194,4 @@ let score = 0;
 let scoreText;
 let bombs;
 let levelMusic;
+let deltaSum = 0;

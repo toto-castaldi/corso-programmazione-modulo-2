@@ -373,3 +373,21 @@ keyM.on("up", () => {
 });
 
 ```
+
+### Il punteggio decresce
+
+```javascript
+
+//in update
+function update(time, delta) {
+    deltaSum += delta;
+
+    if (deltaSum > 5000) {
+        deltaSum = 0;
+        if (score >= 10) {
+            score -= 10;
+            scoreText.setText("Score: " + score);
+        }
+    }
+
+```
