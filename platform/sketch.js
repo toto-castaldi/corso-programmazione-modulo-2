@@ -22,6 +22,8 @@ function preload() {
     this.load.image("star", "assets/star.png");
     this.load.image("bomb", "assets/bomb.png");
     this.load.spritesheet("dude", "assets/dude.png", { frameWidth: 32, frameHeight: 48 });
+
+    this.load.audio("coin", "assets/coin.wav");
 }
 
 function create() {
@@ -117,6 +119,9 @@ function hitBomb(player, bomb) {
 }
 
 function collectStar(player, star) {
+    this.sound.play("coin");
+
+
     star.disableBody(true, true);
 
     score += 10;

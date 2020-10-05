@@ -320,3 +320,13 @@ function hitBomb(player, bomb) {
 debug: false
 
 ```
+### Carica e riproduci un suono
+
+```javascript
+//in create
+this.load.audio("coin", "assets/coin.wav");
+
+//in collectStar
+this.sound.play("coin");
+
+```
