@@ -25,9 +25,12 @@ function preload() {
 
     this.load.audio("coin", "assets/coin.wav");
     this.load.audio("game-over", "assets/game-over.wav");
+    this.load.audio("level", "assets/level.mp3");
 }
 
 function create() {
+    this.sound.play("level", { loop : true});
+    
     this.add.image(400, 300, "sky");
 
     platforms = this.physics.add.staticGroup();
