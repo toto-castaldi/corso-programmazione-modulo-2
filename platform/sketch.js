@@ -29,8 +29,8 @@ function preload() {
 }
 
 function create() {
-    this.sound.play("level", { loop : true});
-    
+    this.sound.play("level", { loop: true });
+
     this.add.image(400, 300, "sky");
 
     platforms = this.physics.add.staticGroup();
@@ -89,6 +89,26 @@ function create() {
     this.physics.add.collider(bombs, platforms);
 
     this.physics.add.collider(player, bombs, hitBomb, null, this);
+
+    let keyM = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.M);
+
+    keyM.on("up", () => {
+        let levelMusic = this.sound.get("level");
+
+        if (levelMusic.isPlaying) {
+            console.log("pause");
+            levelMusic.pause();
+        } else {
+            console.log("resume");
+            levelMusic.resume();
+        }
+    });
+
+    let keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
+
+    keyS.on("up", () => {
+        playSound = !playSound;
+    });
 }
 
 function update() {
@@ -110,6 +130,9 @@ function update() {
     if (cursors.up.isDown && player.body.touching.down) {
         player.setVelocityY(-400);
     }
+    if (cursors.down.isDown) {
+        player.setVelocityY(400);
+    }
 }
 
 function hitBomb(player, bomb) {
@@ -119,13 +142,15 @@ function hitBomb(player, bomb) {
 
     player.anims.play("turn");
 
-    gameOver = true;
-
-    this.sound.play("game-over");
+    if (playSound) {
+        this.sound.play("game-over");
+    }
 }
 
 function collectStar(player, star) {
-    this.sound.play("coin");
+    if (playSound) {
+        this.sound.play("coin");
+    }
 
 
     star.disableBody(true, true);
@@ -148,8 +173,7 @@ function collectStar(player, star) {
     }
 }
 
-
-
+let playSound = true;
 let platforms;
 let stars;
 let player;
@@ -158,3 +182,4 @@ let cursors;
 let score = 0;
 let scoreText;
 let bombs;
+let levelMusic;

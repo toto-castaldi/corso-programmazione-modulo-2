@@ -320,6 +320,19 @@ function hitBomb(player, bomb) {
 debug: false
 
 ```
+
+### Discesa rapida
+
+```javascript
+
+//in update
+if (cursors.down.isDown) {
+    player.setVelocityY(400);
+}
+
+```
+
+
 ### Carica e riproduci un suono
 
 ```javascript
@@ -328,5 +341,35 @@ this.load.audio("coin", "assets/coin.wav");
 
 //in collectStar
 this.sound.play("coin");
+
+```
+
+### Musica in riproduzione continua
+
+```javascript
+
+//in create
+this.sound.play("level", { loop : true});
+
+```
+
+### Start/Stop musica
+
+```javascript
+
+//in create
+let keyM = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.M);
+
+keyM.on("up", () => {
+    let levelMusic = this.sound.get("level");
+
+    if (levelMusic.isPlaying) {
+        console.log("pause");
+        levelMusic.pause();
+    } else {
+        console.log("resume");
+        levelMusic.resume();
+    }
+});
 
 ```
