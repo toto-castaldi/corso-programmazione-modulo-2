@@ -24,6 +24,7 @@ function preload() {
     this.load.spritesheet("dude", "assets/dude.png", { frameWidth: 32, frameHeight: 48 });
 
     this.load.audio("coin", "assets/coin.wav");
+    this.load.audio("game-over", "assets/game-over.wav");
 }
 
 function create() {
@@ -116,6 +117,8 @@ function hitBomb(player, bomb) {
     player.anims.play("turn");
 
     gameOver = true;
+
+    this.sound.play("game-over");
 }
 
 function collectStar(player, star) {
