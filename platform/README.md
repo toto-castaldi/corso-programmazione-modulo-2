@@ -309,6 +309,8 @@ function hitBomb(player, bomb) {
 
     player.setTint(16711680);
 
+    gameOver = true;
+
 }
 
 ```
@@ -382,7 +384,7 @@ keyM.on("up", () => {
 function update(time, delta) {
     deltaSum += delta;
 
-    if (deltaSum > 5000) {
+    if (deltaSum > 5000 && !gameOver) {
         deltaSum = 0;
         if (score >= 10) {
             score -= 10;
@@ -390,4 +392,57 @@ function update(time, delta) {
         }
     }
 
+```
+
+### Più livelli
+
+Ogni livello estende la classe Phaser.Scene
+
+```javascript
+
+class Level0 extends Phaser.Scene {
+
+    constructor() {
+        super({ key: 'level0' });
+    }
+
+    preload() {
+    }
+
+    create() {
+    }
+
+    update(time, delta) {
+    }
+
+}
+
+```
+
+In config si carica tutte le scene 
+
+```javascript
+
+let config = {
+    type: Phaser.AUTO,
+    width: 800,
+    height: 600,
+    scene: [Level0, Level1],
+    physics: {
+        default: 'arcade',
+        arcade: {
+            gravity: { y: 300 },
+            debug: false
+        }
+    }
+};
+
+
+```
+
+Per far partire una nuova scena
+
+```javascript
+
+    this.scene.start('level1');
 ```
