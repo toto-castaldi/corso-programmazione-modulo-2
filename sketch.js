@@ -11,7 +11,7 @@ let game = new Phaser.Game({
         default: "arcade",
         arcade: {
             gravity: { y: 300 },
-            debug: true
+            debug: false
         }
     }
 });
@@ -22,6 +22,11 @@ let stars;
 let scoreText;
 let scoreValue;
 let bombs;
+let mKey;
+let sKey;
+let playSound;
+let timePassed;
+let gameOver;
 
 function scenePreload() {
     console.log("preload");
@@ -32,12 +37,24 @@ function scenePreload() {
 
     this.load.spritesheet("dude", "assets/dude.png", { frameWidth: 32, frameHeight: 48 });
 
+    this.load.audio("coin", "assets/coin.wav");
+    this.load.audio("gameOver", "assets/game-over.wav");
+    this.load.audio("levelMusic", "assets/level.mp3");
+
 }
 
 function sceneCreate() {
     console.log("create");
 
+    //this.sound.play("levelMusic");
+
     scoreValue = 0;
+
+    gameOver = false;
+
+    timePassed = 0;
+
+    playSound = true;
 
     this.add.image(400, 300, "sky");
 
@@ -74,11 +91,16 @@ function sceneCreate() {
     this.physics.add.collider(bombs, platforms);
 
     this.physics.add.overlap(player, stars, (p, s) => {
+        console.log(playSound);
         s.disableBody(true, true);
         scoreValue += 10;
         scoreText.setText("Score : " + scoreValue);
 
-        
+        timePassed = 0;
+
+        if (playSound) {
+            this.sound.play("coin");
+        }
 
         if (stars.countActive() == 0) {
             stars.children.iterate((star) => {
@@ -113,10 +135,57 @@ function sceneCreate() {
     });
 
 
+    this.physics.add.collider(player, bombs, hitBomb, null, this);
+    keyboard = this.input.keyboard.createCursorKeys();
+    mKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.M); //il tasto M ha codice 77
+    sKey = this.input.keyboard.addKey(83);
+
+    mKey.on("up", () => {
+        let levelMusic = this.sound.get("levelMusic");
+        if (levelMusic.isPlaying) {
+            levelMusic.pause();
+        } else {
+            levelMusic.resume();
+        }
+    });
+
+    sKey.on("up", () => playSound = !playSound);
 }
 
-function sceneUpdate() {
-    keyboard = this.input.keyboard.createCursorKeys();
+function hitBomb(player, bomb) {
+    this.physics.pause();
+    player.setTint(11022948);
+
+    if (playSound) {
+        this.sound.play("gameOver");
+    }
+
+    let levelMusic = this.sound.get("levelMusic");
+    if (levelMusic) {
+        levelMusic.pause();
+    }
+
+    gameOver = true;
+}
+
+function sceneUpdate(time, update) {
+    timePassed += update;
+
+    let bombsCount = bombs.countActive();
+    let timeTarget = 5000;
+    if (bombsCount <= 4 ) {
+        timeTarget -= bombsCount*1000;
+    } else {
+        timeTarget = 1000;
+    }
+
+    if (timePassed > timeTarget && !gameOver) {
+        if (scoreValue >= 10) {
+            scoreValue -= 10;
+        }
+        scoreText.setText("Score : " + scoreValue);
+        timePassed = 0;
+    }
 
     //movimento orizzontale 
     if (keyboard.left.isDown) {
@@ -139,4 +208,5 @@ function sceneUpdate() {
     if (keyboard.down.isDown) {
         player.setVelocityY(400);
     }
+
 }
