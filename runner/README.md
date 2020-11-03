@@ -13,6 +13,8 @@ RUNNER
 
 
 ```javascript
+let game;
+
 let gameConfig = {
     type: Phaser.AUTO,
     width: 800,
@@ -22,7 +24,11 @@ let gameConfig = {
 
     // physics settings
     physics: {
-        default: "arcade"
+        default: 'arcade',
+        arcade: {
+            //gravity: { y: 300 },
+            debug: true
+        }
     }
 }
 game = new Phaser.Game(gameConfig);
@@ -59,7 +65,15 @@ class playGame extends Phaser.Scene {
         this.physics.add.existing(platform);
         platform.body.setVelocityX(-50);
         
+        
         this.platformGroup.add(platform);
+
+        this.player = this.physics.add.sprite(game.config.width / 2, game.config.height * 0.7, "player");
+        this.player.setGravityY(300);
+        
+
+        this.physics.add.collider(this.player, this.platformGroup);
+
     }
 
    
@@ -71,31 +85,46 @@ class playGame extends Phaser.Scene {
 
 ```
 
+```javascript
+
+    //il player NON trascina la piattaforma
+    platform.body.setImmovable(true);
+```
+
+```javascript
+    //update
+    this.player.x = game.config.width / 2;
+
+```
+
 ### Gruppi
 
 ```javascript
 
-    //creae
+    //create
 
-        this.platformGroup = this.add.group({
-
-            removeCallback: function (platform) {
-                platform.scene.platformPool.add(platform)
-            }
-        });
-
-        this.platformPool = this.add.group({
-
-            removeCallback: function (platform) {
-                platform.scene.platformGroup.add(platform)
-            }
-        });
-
-
-
+        this.platformGroup = this.add.group();
 
 
 ```
+
+ ### Iterare su gruppi
+
+ ```javascript
+
+    this.platformGroup.getChildren().forEach(function (platform) {
+    
+    }, this);
+
+ ```
+
+ ```javascript
+
+    //rimuove e disattiva
+    this.platformGroup.killAndHide(platform);
+    this.platformGroup.remove(platform);
+
+ ```
 
 ### Mouse
 
@@ -105,20 +134,44 @@ class playGame extends Phaser.Scene {
 
  ```
 
-
- ### Iterare su gruppi
-
- ```javascript
-
- this.platformGroup.getChildren().forEach(function (platform) {
-    
-        }, this);
-
- ```
+ ### Animazione
 
  ```javascript
+        this.anims.create({
+            key: "run",
+            frames: [{ key: "player", frame: 5 }, { key: "player", frame: 6 }, { key: "player", frame: 7 }, { key: "player", frame: 8 }],
+            frameRate: 10,
+            repeat: -1
+        });
 
-                this.platformGroup.killAndHide(platform);
-                this.platformGroup.remove(platform);
 
- ```
+        this.physics.add.collider(this.player, this.platformGroup, () => {
+            if (!this.player.anims.isPlaying) {
+                this.player.anims.play("run");
+            }
+        });
+```
+
+### Restart
+
+```javascript
+ // game over
+        if (this.player.y > game.config.height) {
+            this.scene.start("PlayGame");
+        }
+```
+
+### Doppio salto
+
+```javascript
+ if (this.player.body.touching.down || (this.playerJumps > 0 && this.playerJumps < 2)) {
+            if (this.player.body.touching.down) {
+                this.playerJumps = 0;
+            }
+            this.player.setVelocityY(-300);
+            this.playerJumps++;
+
+            // stops animation
+            this.player.anims.stop();
+        }
+```
